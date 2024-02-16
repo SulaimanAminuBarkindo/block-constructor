@@ -17,14 +17,11 @@ function selectTransactions(transactions) {
         });
     });
 
-    // Sort transactions by fee in descending order
-    const sortedTransactions = transactions.sort((a, b) => parseInt(b[1]) - parseInt(a[1]));
-
-    const block = [];
+    const block = new Set(); // Using Set to store unique transactions
     let totalWeight = 0;
 
     function select(txid) {
-        if (!mempool.has(txid)) return;
+        if (!mempool.has(txid) || block.has(txid)) return;
 
         const { fee, weight, parent_txids } = mempool.get(txid);
 
@@ -32,22 +29,18 @@ function selectTransactions(transactions) {
 
         parent_txids.forEach(parent => select(parent));
 
-        if (!block.includes(txid)) {
-            block.push(txid);
-            totalWeight += weight;
-        }
+        block.add(txid); 
+        totalWeight += weight;
     }
 
-    // Iterate over sorted transactions
-    sortedTransactions.forEach(transaction => {
+    transactions.forEach(transaction => {
         const [txid] = transaction;
         select(txid);
     });
 
     console.log(totalWeight)
-    return block;
+    return Array.from(block);
 }
-
 
 function printTransactions(block) {
     block.forEach(txid => console.log(txid));

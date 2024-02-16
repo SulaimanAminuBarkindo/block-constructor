@@ -17,6 +17,9 @@ function selectTransactions(transactions) {
         });
     });
 
+    // Sort transactions by fee in descending order
+    const sortedTransactions = transactions.sort((a, b) => parseInt(b[1]) - parseInt(a[1]));
+
     const block = [];
     let totalWeight = 0;
 
@@ -35,7 +38,8 @@ function selectTransactions(transactions) {
         }
     }
 
-    transactions.forEach(transaction => {
+    // Iterate over sorted transactions
+    sortedTransactions.forEach(transaction => {
         const [txid] = transaction;
         select(txid);
     });
@@ -43,6 +47,7 @@ function selectTransactions(transactions) {
     console.log(totalWeight)
     return block;
 }
+
 
 function printTransactions(block) {
     block.forEach(txid => console.log(txid));
